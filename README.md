@@ -1,2 +1,2 @@
 # cc_rdm
-CC RDM lproject library.
+CC RDM project library.

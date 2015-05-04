@@ -8,6 +8,7 @@ artifacts to distribution/archival storage.
 from globusonline.transfer.api_client import get_access_token
 from globusonline.transfer.api_client import TransferAPIClient, Transfer
 import bagit
+import os
 
 class Configuration:
 	"""
@@ -17,7 +18,8 @@ class Configuration:
 	
 	def __init__(self, src_endpoint = None, dip_endpoint = None, aip_endpoint = None,
 				 proc_dir = None, ingest_dir = None, aip_dir = None, dip_dir = None, 
-				 globus_user = None, globus_pass = None, needs_preservation = False):
+				 globus_user = None, globus_pass = None, a_rest_url = None,
+				 a_user = None, a_api_key = None, needs_preservation = False):
 		"""
 		Create new configuration.
 		
@@ -44,6 +46,9 @@ class Configuration:
 		self.globus_user = globus_user
 		self.globus_pass = globus_pass
 		self.needs_preservation = needs_preservation
+		self.a_rest_url = a_rest_url
+		self.a_user = a_user
+		self.a_api_key = a_api_key
 		self.api = None
 		
 	def get_api(self):
@@ -107,7 +112,7 @@ class BagOperation:
 		Returns:
 			The bag that is created.
 		"""
-		self.bag = bagit.make_bag(dir, metadata)
+		self.bag = bagit.make_bag(self.dir, self.metadata)
 		return self.bag
 		
 	def is_valid(self):
@@ -164,7 +169,7 @@ class TransferOperation:
 		t = Transfer(submission_id, src, dest)
 		for file in self.file_list:
 			# TODO use path manipulation tools to do this, cleaner
-			t.add_item(self.src_dir + "/" + file, self.dest_dir + "/" + file)
+			t.add_item(os.path.join(self.src_dir, file), os.path.join(self.dest_dir, file))
 		
 		# transfer
 		_, _, data = api.transfer(t)
@@ -214,16 +219,18 @@ class IngestOperation:
 			res = False
 		elif self.config.proc_dir == None:
 			res = False
+		elif self.config.ingest_dir == None:
+			res = False
 		elif self.config.dip_dir == None:
 			res = False
 		elif self.config.needs_preservation and self.config.aip_dir == None:
 			res = False
-		elif self.bagname = None:
+		elif self.bagname == None:
 			res = False
 			
 		return res
 		
-	def ingest(self):
+	def ingest(self, copy_file = False):
 		"""
 		Trigger Archivematica to ingest the bag specified by bagname
 		"""
@@ -231,7 +238,12 @@ class IngestOperation:
 		if self.can_ingest() == False:
 			raise IngestException("Not enough information to ingest bag.")
 			
-		# Copy the file to the A ingest directory
+		# Copy the file to the A ingest directory if needed
+		if copy_file:
+			os.rename(os.path.join(self.config.proc_dir, self.bagname), 
+					  os.path.join(self.config.ingest_dir, self.bagname))
+					  
+		
 		
 		
 		
