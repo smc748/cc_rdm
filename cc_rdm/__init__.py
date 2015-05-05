@@ -75,7 +75,7 @@ class Configuration:
 		
 		return res
 		
-	def is_complete_arc(self)
+	def is_complete_arc(self):
 		"""
 		Check if the configuration is complete enough to attempt an ingestion operation
 		Returns:
@@ -142,7 +142,7 @@ class TransferOperation:
 	def _get_api(self):
 		return self.config.get_api()
 	
-	def add_file(self, filename)
+	def add_file(self, filename):
 		"""
 		Adds a file to the list of files to transfer
 		"""
