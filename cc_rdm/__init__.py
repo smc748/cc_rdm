@@ -33,7 +33,7 @@ class Configuration:
 		self.globus_user = globus_user
 		self.globus_pass = globus_pass
 		self.needs_preservation = needs_preservation
-		self.a_rest_host = a_rest_host
+		self.a_api_host = a_api_host
 		self.a_user = a_user
 		self.a_api_key = a_api_key
 		self.api = None
