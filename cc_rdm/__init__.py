@@ -230,7 +230,7 @@ class IngestOperation:
 			
 		return res
 		
-	def get_unapproved(self)
+	def get_unapproved(self):
 		params = {'user': config.a_user, 'api_key': config.a_api_key}
 		api_path = '/api/transfer/unapproved'
 		r = requests.get(config.rest_host + api_path, params)
