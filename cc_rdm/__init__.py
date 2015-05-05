@@ -9,6 +9,7 @@ from globusonline.transfer.api_client import get_access_token
 from globusonline.transfer.api_client import TransferAPIClient, Transfer
 import bagit
 import os
+import requests
 
 class Configuration:
 	"""
