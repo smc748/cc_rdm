@@ -18,7 +18,7 @@ class Configuration:
 	
 	def __init__(self, src_endpoint = None, dip_endpoint = None, aip_endpoint = None,
 				 proc_dir = None, ingest_dir = None, aip_dir = None, dip_dir = None, 
-				 globus_user = None, globus_pass = None, a_rest_url = None,
+				 globus_user = None, globus_pass = None, a_rest_host = None,
 				 a_user = None, a_api_key = None, needs_preservation = False):
 		"""
 		Create new configuration.
@@ -46,7 +46,7 @@ class Configuration:
 		self.globus_user = globus_user
 		self.globus_pass = globus_pass
 		self.needs_preservation = needs_preservation
-		self.a_rest_url = a_rest_url
+		self.a_rest_host = a_rest_host
 		self.a_user = a_user
 		self.a_api_key = a_api_key
 		self.api = None
@@ -230,6 +230,12 @@ class IngestOperation:
 			
 		return res
 		
+	def get_pending(self)
+		params = {'user': config.a_user, 'api_key': config.a_api_key}
+		api_path = '/api/transfer/unapproved'
+		r = requests.get(config.rest_host + api_path, params)
+		return r.json()
+		
 	def ingest(self, copy_file = False):
 		"""
 		Trigger Archivematica to ingest the bag specified by bagname
@@ -237,15 +243,16 @@ class IngestOperation:
 		
 		if self.can_ingest() == False:
 			raise IngestException("Not enough information to ingest bag.")
-			
+		
 		# Copy the file to the A ingest directory if needed
 		if copy_file:
 			os.rename(os.path.join(self.config.proc_dir, self.bagname), 
 					  os.path.join(self.config.ingest_dir, self.bagname))
 					  
-		
-		
-		
+		# trigger ingestion
+# 		params = 
+# 		r = requests.
+
 		
 class IngestException(Exception):
 	"""
