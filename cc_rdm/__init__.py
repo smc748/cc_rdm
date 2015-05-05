@@ -223,9 +223,9 @@ class IngestOperation:
 		return res
 		
 	def get_unapproved(self):
-		params = {'user': self.config.a_user, 'api_key': self.config.a_api_key}
+		params = {'username': self.config.a_user, 'api_key': self.config.a_api_key}
 		api_path = '/api/transfer/unapproved'
-		r = requests.get(self.config.a_api_host + api_path, params)
+		r = requests.get(self.config.a_api_host + api_path, params=params)
 		return r.json()
 		
 	def ingest(self, bagname = None):
