@@ -225,21 +225,21 @@ class IngestOperation:
 	def get_unapproved(self):
 		params = {'user': self.config.a_user, 'api_key': self.config.a_api_key}
 		api_path = '/api/transfer/unapproved'
-		r = requests.get(config.rest_host + api_path, params)
+		r = requests.get(self.config.rest_host + api_path, params)
 		return r.json()
 		
-	def ingest(self, copy_file = False):
+	def ingest(self, bagname = None):
 		"""
 		Trigger Archivematica to ingest the bag specified by bagname
 		"""
 		
+		if bagname != None:
+			self.bagname = bagname
+		
 		if self.can_ingest() == False:
 			raise IngestException("Not enough information to ingest bag.")
 		
-		# Copy the file to the A ingest directory if needed
-		if copy_file:
-			os.rename(os.path.join(self.config.proc_dir, self.bagname), 
-					  os.path.join(self.config.ingest_dir, self.bagname))
+
 					  
 
 		
