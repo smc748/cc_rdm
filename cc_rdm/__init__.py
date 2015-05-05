@@ -16,33 +16,20 @@ class Configuration:
 	
 	"""
 	
-	def __init__(self, src_endpoint = None, dip_endpoint = None, aip_endpoint = None,
-				 proc_dir = None, ingest_dir = None, aip_dir = None, dip_dir = None, 
-				 globus_user = None, globus_pass = None, a_rest_host = None,
+	def __init__(self, globus_user = None, globus_pass = None, a_api_host = None,
 				 a_user = None, a_api_key = None, needs_preservation = False):
 		"""
 		Create new configuration.
 		
 		Parameters:
-			src_endpoint - Globus endpoint where data to ingest from is stored 
-			dip_endpoint - Globus endpoint where DIP will be stored
-			aip_endpoint - Globus endpoint where AIP will be stored
-			proc_dir - Directory where files are stored when moving
-			ingest_dir - Directory Archivematica operations are started from
-			aip_dir - Directory AIPs will be copied from
-			dip_dir - Directory DIPs will be copied from
 			globus_user - Globus username to transfer under
 			globus_pass - Globus password (need to see if alternate method exists)
+			a_user - Archivematica API username
+			a_api_key - Archivematica API key
+			a_api_host - Archivematica hostname to run API queries against
 			needs_preservatiopn - Is AIP creation and storage necessary
 		
 		"""
-		self.src_endpoint = src_endpoint
-		self.dip_endpoint = dip_endpoint
-		self.aip_endpoint = aip_endpoint
-		self.proc_dir = proc_dir
-		self.ingest_dir = ingest_dir
-		self.aip_dir = aip_dir
-		self.dip_dir = dip_dir
 		self.globus_user = globus_user
 		self.globus_pass = globus_pass
 		self.needs_preservation = needs_preservation
@@ -74,18 +61,31 @@ class Configuration:
 											  goauth=auth_tok.token) 
 		return self.api
 		
-	def is_complete(self):
+	def is_complete_globus(self):
 		"""
-		Check if the configuration is complete enough to attempt an operation
+		Check if the configuration is complete enough to attempt a transfer operation
 		
 		Returns:
-			True if required endpoints and Globus information is complete. False otherwise
+			True if required Globus information is complete. False otherwise
 		"""
 		res = True
 
 		if self.globus_user == None or self.globus_pass == None:
 			res = False
 		
+		return res
+		
+	def is_complete_arc(self)
+		"""
+		Check if the configuration is complete enough to attempt an ingestion operation
+		Returns:
+			True if required Archivematica information is present. False otherwise.
+		"""
+		
+		res = True
+		if self.a_user == None or self.a_api_host == None or self.a_api_key == None:
+			res = False
+	
 		return res
 		
 class BagOperation:
@@ -142,18 +142,18 @@ class TransferOperation:
 	def _get_api(self):
 		return self.config.get_api()
 	
-	def start_transfer(self, src = None, dest = None):
+	def add_file(self, filename)
+		"""
+		Adds a file to the list of files to transfer
+		"""
+		self.file_list.append(filename)
+	
+	def start_transfer(self, src, dest):
 		"""
 		Starts a transfer
 		
 		"""
-		
-		if src == None:
-			 src = self.config.src_endpoint
-		
-		if dest == None:
-			dest = self.config.proc_endpoint
-		
+				
 		if self.file_list == None or len(self.file_list) == 0:
 			raise TransferException("No files specified for transfer")
 		
@@ -168,7 +168,6 @@ class TransferOperation:
 		submission_id = data["value"]
 		t = Transfer(submission_id, src, dest)
 		for file in self.file_list:
-			# TODO use path manipulation tools to do this, cleaner
 			t.add_item(os.path.join(self.src_dir, file), os.path.join(self.dest_dir, file))
 		
 		# transfer
@@ -217,14 +216,6 @@ class IngestOperation:
 		res = True
 		if self.config == None:
 			res = False
-		elif self.config.proc_dir == None:
-			res = False
-		elif self.config.ingest_dir == None:
-			res = False
-		elif self.config.dip_dir == None:
-			res = False
-		elif self.config.needs_preservation and self.config.aip_dir == None:
-			res = False
 		elif self.bagname == None:
 			res = False
 			
@@ -249,9 +240,6 @@ class IngestOperation:
 			os.rename(os.path.join(self.config.proc_dir, self.bagname), 
 					  os.path.join(self.config.ingest_dir, self.bagname))
 					  
-		# trigger ingestion
-# 		params = 
-# 		r = requests.
 
 		
 class IngestException(Exception):
