@@ -196,16 +196,18 @@ class IngestOperation:
 	"""
 	Handles an ingestion to Archivematica
 	"""
-	def __init__(self, config = None, bagname = None):
+	def __init__(self, config = None, bagname = None, type = 'unzipped bag'):
 		"""
 		Create a new IngestOperation
 		
 		Parameters:	
 			config - Configuration object that contains info on directories for Archivematica ingestion
 			bagname - Name of the bag to be ingested.
+			type - transfer type. Defaults to 'unzipped bag'.
 		"""
 		self.config = config
 		self.bagname = bagname
+		self.type = type
 		
 	def can_ingest(self):
 		"""
@@ -228,19 +230,25 @@ class IngestOperation:
 		r = requests.get(self.config.a_api_host + api_path, params=params)
 		return r.json()
 		
-	def ingest(self, bagname = None):
+	def ingest(self, bagname = None, type = None):
 		"""
 		Trigger Archivematica to ingest the bag specified by bagname
 		"""
 		
 		if bagname != None:
 			self.bagname = bagname
+			
+		if type != None:
+			self.type = type
 		
 		if self.can_ingest() == False:
 			raise IngestException("Not enough information to ingest bag.")
 		
-
-					  
+		params = {'username': self.config.a_user, 'api_key': self.conig.a_api_key, 
+				  'directory': self.bagname, 'type': self.type}
+		api_path = '/api/transfer/approve'
+		r = requests.get(self.config.a_api_host + api_path, params = params)
+		
 
 		
 class IngestException(Exception):
