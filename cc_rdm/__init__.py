@@ -248,6 +248,7 @@ class IngestOperation:
 				  'directory': self.bagname, 'type': self.type}
 		api_path = '/api/transfer/approve'
 		r = requests.get(self.config.a_api_host + api_path, params = params)
+		return r.json()
 		
 
 		
