@@ -244,7 +244,7 @@ class IngestOperation:
 		if self.can_ingest() == False:
 			raise IngestException("Not enough information to ingest bag.")
 		
-		params = {'username': self.config.a_user, 'api_key': self.conig.a_api_key, 
+		params = {'username': self.config.a_user, 'api_key': self.config.a_api_key, 
 				  'directory': self.bagname, 'type': self.type}
 		api_path = '/api/transfer/approve'
 		r = requests.get(self.config.a_api_host + api_path, params = params)
