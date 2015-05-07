@@ -136,7 +136,7 @@ class BagOperation:
 			bag - The bag this operation works on
 		"""
 		self.dir = dir
-		self.metadata = {}
+		self.metadata = metadata
 		self.bag = bag
 		
 	def make_bag(self):
