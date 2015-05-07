@@ -10,6 +10,7 @@ from globusonline.transfer.api_client import TransferAPIClient, Transfer
 import bagit
 import os
 import requests
+import ConfigParser
 
 class Configuration:
 	"""
@@ -89,6 +90,38 @@ class Configuration:
 	
 		return res
 		
+	def getConfig(configFile):
+		"""
+		Create a Configuration object from a config file
+		
+		Parameters:
+			configFile - Absolute path to the config file
+		
+		Returns:
+			Configuration object containing data from the config file.
+		"""	
+		cfgfile = ConfigParser.ConfigParser()
+		cfgfile.read(configFile)
+		
+		config = Configuration()
+		
+		items = cfgfile.items('Config')
+		for item in items:
+			value = items[item]
+			key = item
+			if key == 'globus_user':
+				config.globus_user = value
+			elif key == 'globus_pass':
+				config.globus_pass = value
+			elif key == 'a_user':
+				config.a_user = value
+			elif key == 'a_api_host':
+				config.a_api_host = value
+			elif key == 'a_api_key':
+				config.a_api_key = value
+				
+		return config
+
 class BagOperation:
 	"""
 	Handles bag processing
@@ -113,6 +146,9 @@ class BagOperation:
 		Returns:
 			The bag that is created.
 		"""
+		if len(self.metadata.keys()) < 1:
+			raise BagException("No metadata for bag")
+		
 		self.bag = bagit.make_bag(self.dir, self.metadata)
 		return self.bag
 		
@@ -248,16 +284,11 @@ class IngestOperation:
 				  'directory': self.bagname, 'type': self.type}
 		api_path = '/api/transfer/approve'
 		r = requests.post(self.config.a_api_host + api_path, data = params)
-		return r
+		
+		if r.status_code != 200:
+			raise IngestException("Archivematica returned HTTP status: " + str(r.status_code))
 		
 
-		
-class IngestException(Exception):
-	"""
-	Raised when an ingest operation fails
-	"""	
-	pass
-		
 class ConfigException(Exception):
 	"""
 	Raised when configuration information is missing or incorrect.
@@ -269,3 +300,17 @@ class TransferException(Exception):
 	Raised when transfer fails.
 	"""
 	pass
+	
+class BagException(Exception):
+	"""
+	Raised when bag operation can not be completed.
+	"""
+	pass
+			
+class IngestException(Exception):
+	"""
+	Raised when an ingest operation fails
+	"""	
+	pass
+		
+
