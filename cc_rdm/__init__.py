@@ -261,6 +261,9 @@ class IngestOperation:
 		return res
 		
 	def get_unapproved(self):
+		"""
+		Get a list of unapproved transfers in JSON format.
+		"""
 		params = {'username': self.config.a_user, 'api_key': self.config.a_api_key}
 		api_path = '/api/transfer/unapproved'
 		r = requests.get(self.config.a_api_host + api_path, params=params)
