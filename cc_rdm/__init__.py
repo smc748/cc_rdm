@@ -90,38 +90,46 @@ class Configuration:
 	
 		return res
 		
-	def getConfig(configFile):
-		"""
-		Create a Configuration object from a config file
-		
-		Parameters:
-			configFile - Absolute path to the config file
-		
-		Returns:
-			Configuration object containing data from the config file.
-		"""	
-		cfgfile = ConfigParser.ConfigParser()
-		cfgfile.read(configFile)
-		
-		config = Configuration()
-		
-		items = cfgfile.items('Config')
-		for item in items:
-			value = items[item]
-			key = item
-			if key == 'globus_user':
-				config.globus_user = value
-			elif key == 'globus_pass':
-				config.globus_pass = value
-			elif key == 'a_user':
-				config.a_user = value
-			elif key == 'a_api_host':
-				config.a_api_host = value
-			elif key == 'a_api_key':
-				config.a_api_key = value
-				
-		return config
+def getConfig(configFile):
+	"""
+	Create a Configuration object from a config file
+	
+	Parameters:
+		configFile - Absolute path to the config file
+	
+	Returns:
+		Configuration object containing data from the config file.
+	"""		
+	cfg = ConfigParser.ConfigParser()
+	cfg.read(configFile)
 
+	cc_config = Configuration()
+
+	for section in cfg.sections():
+		items = cfg.items(section)
+		if section == "Archivematica":
+			print "Archivematica config:"
+			for item in items:
+				key = item[0]
+				val = item[1]
+				if key == "host":
+					cc_config.a_api_host = val
+				elif key == "user":
+					cc_config.a_user = val
+				elif key == "key":
+					cc_config.a_api_key = val
+		elif section == "Globus":
+			print "Globus config"
+			for item in items:
+				key = item[0]
+				val = item[1]
+				if key == "user":
+					cc_config.globus_user = val
+				elif key == "pass":
+					cc_config.globus_pass = val
+				
+	return cc_config
+	
 class BagOperation:
 	"""
 	Handles bag processing
@@ -226,7 +234,6 @@ class TransferOperation:
 		_, _, data = api.task(self.go_task_id, fields="status")
 		
 		return data["status"]
-		
 		
 class IngestOperation:
 	"""
