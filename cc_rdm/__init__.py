@@ -90,7 +90,7 @@ class Configuration:
 	
 		return res
 		
-def getConfig(configFile):
+def getConfig(configFile='/etc/cc_rdm.cfg'):
 	"""
 	Create a Configuration object from a config file
 	
