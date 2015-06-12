@@ -108,7 +108,6 @@ def getConfig(configFile='/etc/cc_rdm.cfg'):
 	for section in cfg.sections():
 		items = cfg.items(section)
 		if section == "Archivematica":
-			print "Archivematica config:"
 			for item in items:
 				key = item[0]
 				val = item[1]
@@ -119,7 +118,6 @@ def getConfig(configFile='/etc/cc_rdm.cfg'):
 				elif key == "key":
 					cc_config.a_api_key = val
 		elif section == "Globus":
-			print "Globus config"
 			for item in items:
 				key = item[0]
 				val = item[1]
